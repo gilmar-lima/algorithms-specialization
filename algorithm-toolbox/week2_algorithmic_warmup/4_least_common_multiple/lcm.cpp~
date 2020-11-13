@@ -1,0 +1,40 @@
+#include <iostream>
+
+long long lcm_naive(int a, int b) {
+  for (long l = 1; l <= (long long) a * b; ++l)
+    if (l % a == 0 && l % b == 0)
+      return l;
+
+  return (long long) a * b;
+}
+
+int gcd_fast(int a, int b) {
+
+  int greater = max(a,b);
+  int minor = min(a,b);
+  int remainder = greater % minor;
+
+  while (remainder != 0) {
+    
+    greater = minor;
+    minor = remainder;
+    remainder = greater % minor;
+    
+  }
+
+  return minor;  
+}
+
+long long lcm_fast(int a, int b){
+
+  long long multiplied = a * b;
+
+  return (multiplied / gcd_fast(a, b));
+}
+
+int main() {
+  int a, b;
+  std::cin >> a >> b;
+  std::cout << lcm_fast(a, b) << std::endl;
+  return 0;
+}
