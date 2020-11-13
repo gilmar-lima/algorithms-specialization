@@ -1,25 +1,63 @@
 #include <iostream>
 
-int fibonacci_sum_squares_naive(long long n) {
-    if (n <= 1)
-        return n;
+long long pisano_period(long long m){
 
-    long long previous = 0;
-    long long current  = 1;
-    long long sum      = 1;
+    long long currentFib = 1;
+    long long previousFib = 0;
+    long long pisanoPeriod = 0;
 
-    for (long long i = 0; i < n - 1; ++i) {
-        long long tmp_previous = previous;
-        previous = current;
-        current = tmp_previous + current;
-        sum += current * current;
+    do{
+	long long temp;
+
+	temp = (currentFib + previousFib) % m;
+	previousFib = currentFib;
+	currentFib = temp;
+	
+	pisanoPeriod++;
+	
+    }while(previousFib != 0 || currentFib != 1);
+  
+    return pisanoPeriod;
+}
+
+long long fibonacci_fast(long long n, long long m) {
+    
+    long long sequence[2] = {0, 1};
+    long long nextNumber = 0;
+
+    if(n <= 1)
+	return n;    
+    
+    for(int i = 2; i <= n; i++){
+	nextNumber = (sequence[0] + sequence[1]) % m;
+	sequence[0] = sequence[1];
+	sequence[1] = nextNumber;
     }
+  
+    return nextNumber;
+}
 
-    return sum % 10;
+
+long long get_fibonacci_huge_fast(long long n, long long m) {
+
+    long long result = 0;
+    
+    n = n % pisano_period(m);
+    result = fibonacci_fast(n, m);
+    
+    return result;
+}
+
+long long fibonacci_sum_squares_fast(long long  n) {
+
+    long long fib_current = get_fibonacci_huge_fast(n,10);
+    long long fib_next = get_fibonacci_huge_fast(n+1,10);
+     
+    return (fib_next*fib_current) % 10;
 }
 
 int main() {
     long long n = 0;
     std::cin >> n;
-    std::cout << fibonacci_sum_squares_naive(n);
+    std::cout << fibonacci_sum_squares_fast(n);
 }
