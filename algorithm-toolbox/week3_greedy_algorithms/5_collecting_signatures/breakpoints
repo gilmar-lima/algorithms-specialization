@@ -1,0 +1,5 @@
+break optimal_points(std::vector<Segment, std::allocator<Segment> >&)
+break /home/gilmar/Documents/Coursera/algorithms-specialization/algorithm-toolbox/week3_greedy_algorithms/5_collecting_signatures/covering_segments.cpp:19
+break /home/gilmar/Documents/Coursera/algorithms-specialization/algorithm-toolbox/week3_greedy_algorithms/5_collecting_signatures/covering_segments.cpp:23
+break /home/gilmar/Documents/Coursera/algorithms-specialization/algorithm-toolbox/week3_greedy_algorithms/5_collecting_signatures/covering_segments.cpp:30
+break /home/gilmar/Documents/Coursera/algorithms-specialization/algorithm-toolbox/week3_greedy_algorithms/5_collecting_signatures/covering_segments.cpp:43
