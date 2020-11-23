@@ -1,12 +1,26 @@
 #include <iostream>
 #include <vector>
 
-using std::vector;
+using namespace std;
 
 vector<int> optimal_summands(int n) {
-  vector<int> summands;
-  //write your code here
-  return summands;
+    vector<int> summands;
+    int current_number = 1;
+    int remainder;
+
+    while (n != 0) {
+	remainder = n - current_number;
+	if(remainder > current_number || remainder == 0){
+
+	    summands.push_back(current_number);
+	    n = n - current_number;
+	}
+
+	current_number++;	
+    }
+	
+      
+    return summands;
 }
 
 int main() {
