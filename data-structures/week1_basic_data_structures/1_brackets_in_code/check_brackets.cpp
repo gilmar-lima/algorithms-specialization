@@ -2,6 +2,8 @@
 #include <stack>
 #include <string>
 
+using namespace std;
+
 struct Bracket {
     Bracket(char type, int position):
         type(type),
@@ -31,15 +33,34 @@ int main() {
         char next = text[position];
 
         if (next == '(' || next == '[' || next == '{') {
-            // Process opening bracket, write your code here
+
+	    opening_brackets_stack.push(Bracket(next, position));
         }
 
         if (next == ')' || next == ']' || next == '}') {
-            // Process closing bracket, write your code here
-        }
+
+	    if (opening_brackets_stack.empty()){
+		cout << position + 1 << "\n";
+		return 0;
+	    }
+
+	    Bracket top = opening_brackets_stack.top();
+	    opening_brackets_stack.pop();
+	    if ((top.type == '[' && next != ']') ||
+		(top.type == '{' && next != '}') ||
+		(top.type == '(' && next != ')')) {
+		
+		cout << position + 1 << "\n";
+		return 0;
+	    }
+	}
     }
 
-    // Printing answer, write your code here
-
+    if(opening_brackets_stack.empty()){
+	cout << "Success" << "\n";
+    }else{
+	cout << opening_brackets_stack.top().position + 1 << "\n";
+    }
+    
     return 0;
 }
