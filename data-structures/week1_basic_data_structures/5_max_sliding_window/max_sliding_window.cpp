@@ -1,21 +1,26 @@
 #include <iostream>
 #include <vector>
+#include <queue>
+#include <algorithm>
 
-using std::cin;
-using std::cout;
-using std::vector;
-using std::max;
+using namespace std;
 
-void max_sliding_window_naive(vector<int> const & A, int w) {
-    for (size_t i = 0; i < A.size() - w + 1; ++i) {
-        int window_max = A.at(i);
-        for (size_t j = i + 1; j < i + w; ++j)
-            window_max = max(window_max, A.at(j));
-
-        cout << window_max << " ";
+void max_sliding_window(vector<int> const & A, unsigned int w) {
+    
+    queue<int> window ;
+    
+    for(int element : A){
+	
+	window.push(element);
+	if(window.size() == w){
+	    cout << *max_element(&window.front(),&window.back() + 1) << " ";
+	}else if(window.size() > w){
+	    window.pop();
+	    cout << *max_element(&window.front(),&window.back() + 1) << " ";
+	}
+	
     }
 
-    return;
 }
 
 
@@ -24,13 +29,13 @@ int main() {
     cin >> n;
 
     vector<int> A(n);
-    for (size_t i = 0; i < n; ++i)
+    for (int i = 0; i < n; ++i)
         cin >> A.at(i);
 
     int w = 0;
     cin >> w;
 
-    max_sliding_window_naive(A, w);
+    max_sliding_window(A, w);
 
     return 0;
 }
