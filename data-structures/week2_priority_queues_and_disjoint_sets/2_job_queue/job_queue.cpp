@@ -1,18 +1,20 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
-using std::vector;
-using std::cin;
-using std::cout;
+using namespace std;
 
 class JobQueue {
  private:
   int num_workers_;
   vector<int> jobs_;
-
   vector<int> assigned_workers_;
   vector<long long> start_times_;
+  struct worker{
+    int worker_id;
+    long long time;
+  };
 
   void WriteResponse() const {
     for (int i = 0; i < jobs_.size(); ++i) {
@@ -27,23 +29,41 @@ class JobQueue {
     for(int i = 0; i < m; ++i)
       cin >> jobs_[i];
   }
-
+   
   void AssignJobs() {
-    // TODO: replace this code with a faster algorithm.
+
+    //Lambda function for comparison
+    auto comparison = [](worker a, worker b){
+
+      if(a.time == b.time){
+        return a.worker_id > b.worker_id;
+      }
+        return a.time > b.time;    
+    };
+    
     assigned_workers_.resize(jobs_.size());
     start_times_.resize(jobs_.size());
     vector<long long> next_free_time(num_workers_, 0);
+    priority_queue<worker, vector<worker>, decltype(comparison)> next_free_worker (comparison);
+
+    for(int i = 0; i < num_workers_; i++){
+      worker w {i,0};
+      next_free_worker.push(w);
+    }        
+
     for (int i = 0; i < jobs_.size(); ++i) {
       int duration = jobs_[i];
-      int next_worker = 0;
-      for (int j = 0; j < num_workers_; ++j) {
-        if (next_free_time[j] < next_free_time[next_worker])
-          next_worker = j;
-      }
-      assigned_workers_[i] = next_worker;
-      start_times_[i] = next_free_time[next_worker];
-      next_free_time[next_worker] += duration;
+      worker next_worker = next_free_worker.top();
+      next_free_worker.pop();
+           
+      assigned_workers_[i] = next_worker.worker_id;
+      start_times_[i] = next_worker.time;
+      next_worker.time += duration;
+
+      next_free_worker.push(next_worker);
     }
+    
+    
   }
 
  public:
