@@ -5,10 +5,7 @@
 #include <sys/resource.h>
 #endif
 
-using std::vector;
-using std::ios_base;
-using std::cin;
-using std::cout;
+using namespace std;
 
 class TreeOrders {
   int n;
@@ -27,27 +24,60 @@ public:
     }
   }
 
+  void inorder_order_traversal(int node_index, vector<int> &result){
+    if(node_index == -1){
+      return;
+    }
+
+    inorder_order_traversal(left[node_index], result);
+    result.push_back(key[node_index]);
+    inorder_order_traversal(right[node_index], result);
+  }
 
   vector <int> in_order() {
     vector<int> result;
     // Finish the implementation
     // You may need to add a new recursive method to do that
+    inorder_order_traversal(0, result);
 
     return result;
+  }
+
+  void pre_order_traversal(int node_index, vector<int> &result){
+    if(node_index == -1){
+      return;
+    }
+
+    result.push_back(key[node_index]);
+    pre_order_traversal(left[node_index], result);
+    pre_order_traversal(right[node_index], result);
   }
 
   vector <int> pre_order() {
     vector<int> result;    
     // Finish the implementation
     // You may need to add a new recursive method to do that
+    pre_order_traversal(0,result);
     
     return result;
   }
 
+  void post_order_traversal(int node_index, vector<int> &result){
+    if(node_index == -1){
+      return;
+    }
+
+    post_order_traversal(left[node_index], result);
+    post_order_traversal(right[node_index], result);
+    result.push_back(key[node_index]);
+
+  }
+  
   vector <int> post_order() {
     vector<int> result;
     // Finish the implementation
     // You may need to add a new recursive method to do that
+    post_order_traversal(0,result);
     
     return result;
   }
