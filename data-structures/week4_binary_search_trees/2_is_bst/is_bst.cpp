@@ -2,11 +2,7 @@
 #include <iostream>
 #include <vector>
 
-using std::cin;
-using std::cout;
-using std::endl;
-using std::vector;
-
+using namespace std;
 struct Node {
   int key;
   int left;
@@ -16,8 +12,29 @@ struct Node {
   Node(int key_, int left_, int right_) : key(key_), left(left_), right(right_) {}
 };
 
+void inorder_order_traversal(int node_index, const vector<Node>& tree, vector<int>& result){
+    if(node_index == -1){
+      return;
+    }
+
+    inorder_order_traversal(tree[node_index].left, tree, result);
+    result.push_back(tree[node_index].key);
+    inorder_order_traversal(tree[node_index].right, tree, result);
+}
+
 bool IsBinarySearchTree(const vector<Node>& tree) {
   // Implement correct algorithm here
+  vector<int> result;
+
+  if(tree.size() == 0) return true;
+
+  inorder_order_traversal(0, tree, result);
+
+  for (size_t i = 0; i < result.size()-1; i++)
+  {
+    if(result[i] > result[i+1]) return false;
+  }  
+
   return true;
 }
 
@@ -30,7 +47,7 @@ int main() {
     cin >> key >> left >> right;
     tree.push_back(Node(key, left, right));
   }
-  if (IsBinarySearchTree(tree) {
+  if (IsBinarySearchTree(tree)) {
     cout << "CORRECT" << endl;
   } else {
     cout << "INCORRECT" << endl;
