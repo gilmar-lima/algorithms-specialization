@@ -1,13 +1,36 @@
 #include <iostream>
 #include <vector>
 
-using std::vector;
-using std::pair;
+using namespace std;
+
+void explore(vector<bool> &visited, vector<vector<int> > &adj, const int &v){
+
+  visited[v] = true;
+
+  for (auto w : adj[v])
+  {
+    if(!visited[w]){
+      explore(visited,adj,w);      
+    }
+  }
+}
+
+int DFS(vector<vector<int> > &adj){
+  int cc = 0;
+  vector<bool> visited (adj.size(), false);
+
+  for (size_t v = 0; v < adj.size(); v++)
+  {
+    if(!visited[v]){
+      explore(visited,adj,v); 
+      cc++;     
+    }
+  } 
+  return cc;
+}
 
 int number_of_components(vector<vector<int> > &adj) {
-  int res = 0;
-  //write your code here
-  return res;
+  return DFS(adj);
 }
 
 int main() {
