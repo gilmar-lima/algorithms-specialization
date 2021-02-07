@@ -43,8 +43,8 @@ void DFS(vector<vector<int> > &adj){
 
   for (size_t v = 0; v < adj.size(); v++)
   {
-    if(!visited[v]){
-      explore(visited,adj,v); 
+    if(!visited[0]){
+      explore(visited,adj,0); 
     }
   } 
 }
@@ -52,17 +52,17 @@ void DFS(vector<vector<int> > &adj){
 void DFS2(vector<vector<int> > &adj){
   vector<bool> visited (adj.size(), false);
 
-  for (size_t v = 0; v < adj.size(); v++)
-  {
-    if(!visited[v]){
-      explore2(visited,adj,v); 
+  //for (size_t v = 0; v < adj.size(); v++)
+  //{
+    if(!visited[0]){
+      explore2(visited,adj,0); 
     }
-  } 
+  //} 
 }
 
 int acyclic(vector<vector<int> > &adj) {
   DFS(adj);
-  //DFS2(adj);
+  DFS2(adj);
   return cyclicity;
 }
 
