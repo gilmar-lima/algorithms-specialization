@@ -5,65 +5,70 @@
 using namespace std;
 
 int counter = 1;
-int cyclicity = 0;
-unordered_map<int,int> post;
+unordered_map<int,int> post, pre;
 
 void post_visit(int v){
   post[v] = counter;
   counter++;
 }
 
+void pre_visit(int v){
+  pre[v] = counter;
+  counter++;
+}
+
 void explore(vector<bool> &visited, vector<vector<int> > &adj, const int &v){
 
   visited[v] = true;
+  pre_visit(v);
   for (auto w : adj[v])
   {
     if(!visited[w]){
-      explore(visited,adj,w);      
+      explore(visited,adj,w);          
     }
   }
   post_visit(v);
+  
 }
 
-void explore2(vector<bool> &visited, vector<vector<int> > &adj, const int &v){
-  visited[v] = true;
-  for (auto w : adj[v])
-  {
-    if(!visited[w]){
-      if(post[v]>post[w]){
-        cyclicity = 1;        
-      } 
-      explore2(visited,adj,w);      
-    }
+bool isCyclic(int u, int v){
+  if(pre[v]<pre[u] && post[u]<post[v]){
+    return true;
+  }else{
+    return false;
   }
 }
+
+
 
 void DFS(vector<vector<int> > &adj){
   vector<bool> visited (adj.size(), false);
 
   for (size_t v = 0; v < adj.size(); v++)
   {
-    if(!visited[0]){
-      explore(visited,adj,0); 
+    if(!visited[v]){
+      explore(visited,adj,v); 
     }
   } 
 }
 
-void DFS2(vector<vector<int> > &adj){
+int checkCyclicity(vector<vector<int> > &adj){
   vector<bool> visited (adj.size(), false);
 
-  //for (size_t v = 0; v < adj.size(); v++)
-  //{
-    if(!visited[0]){
-      explore2(visited,adj,0); 
+  for (size_t v1 = 0; v1 < adj.size(); v1++)
+  {
+    for(auto v2 : adj[v1])
+    {
+      if(isCyclic(v1, v2)) return 1;       
     }
-  //} 
+  }
+
+  return 0;    
 }
 
 int acyclic(vector<vector<int> > &adj) {
-  DFS(adj);
-  DFS2(adj);
-  return cyclicity;
+  DFS(adj);  
+  return checkCyclicity(adj);
 }
 
 int main() {
