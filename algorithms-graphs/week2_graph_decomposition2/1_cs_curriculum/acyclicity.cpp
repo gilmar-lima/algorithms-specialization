@@ -39,8 +39,6 @@ bool isCyclic(int u, int v){
   }
 }
 
-
-
 void DFS(vector<vector<int> > &adj){
   vector<bool> visited (adj.size(), false);
 
