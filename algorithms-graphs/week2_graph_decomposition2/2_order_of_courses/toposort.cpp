@@ -1,18 +1,63 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <queue>
+#include <unordered_map>
 
-using std::vector;
-using std::pair;
+using namespace std;
+struct node{
+  int value;
+  int post;
+};
 
-void dfs(vector<vector<int> > &adj, vector<int> &used, vector<int> &order, int x) {
-  //write your code here
+auto comparison = [](node a, node b){
+  return a.post < b.post;          
+};
+priority_queue<node, vector<node>, decltype(comparison)> topo_order (comparison);
+
+int counter = 1;
+
+void post_visit(int v){  
+  node current_node {v,counter};
+  topo_order.push(current_node);
+  counter++;
+}
+
+void explore(vector<bool> &visited, vector<vector<int> > &adj, const int &v){
+  visited[v] = true;
+  for (auto w : adj[v])
+  {
+    if(!visited[w]){
+      explore(visited,adj,w);          
+    }
+  }
+  post_visit(v);  
+}
+
+void dfs(vector<vector<int> > &adj){
+  vector<bool> visited (adj.size(), false);
+
+  for (size_t v = 0; v < adj.size(); v++)
+  {
+    if(!visited[v]){
+      explore(visited,adj,v); 
+    }
+  } 
 }     
 
 vector<int> toposort(vector<vector<int> > adj) {
   vector<int> used(adj.size(), 0);
   vector<int> order;
-  //write your code here
+  dfs(adj);
+
+  int queue_size = topo_order.size();
+
+  for(int i = 0; i<queue_size; i++)
+  {
+    order.push_back(topo_order.top().value);
+    topo_order.pop();
+  }
+
   return order;
 }
 
