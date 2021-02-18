@@ -1,13 +1,42 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <climits>
 
-using std::vector;
-using std::queue;
+using namespace std;
 
-int distance(vector<vector<int> > &adj, int s, int t) {
-  //write your code here
-  return -1;
+vector<int> bfs(vector<vector<int> > &adj, int &s){
+  vector<int> dist (adj.size(), INT_MAX);
+
+  dist[s] = 0;
+  queue<int> node_queue;
+  node_queue.push(s);
+
+  while (!node_queue.empty())
+  {
+    int u = node_queue.front();
+    node_queue.pop();
+
+    for(auto v : adj[u]){
+      if(dist[v] == INT_MAX){
+        node_queue.push(v);
+        dist[v] = dist[u] + 1;
+      }
+    }
+  }
+
+  return dist;
+}
+
+int distance(vector<vector<int> > &adj, int s, int t) { 
+  
+  vector<int> dist = bfs(adj, s);
+  if(dist[t] == INT_MAX){
+    return -1;
+  }else{
+    return dist[t];
+  }
+  
 }
 
 int main() {
