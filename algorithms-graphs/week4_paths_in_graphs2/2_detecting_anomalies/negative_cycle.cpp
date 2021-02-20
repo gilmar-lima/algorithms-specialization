@@ -17,7 +17,7 @@ int negative_cycle(vector<vector<int> > &adj, vector<vector<int> > &cost) {
       dist[vertex]  = 0;
 
       for(size_t r = 0; r < adj.size() - 1; r++){
-
+      bool changed = false;
       unordered_set<int> R;
       node_queue.push(vertex);
       visited[vertex] = true;
@@ -46,11 +46,14 @@ int negative_cycle(vector<vector<int> > &adj, vector<vector<int> > &cost) {
 
             if(is_last_iteration && dist_updated){
               return 1;
-            } 
+            }
+
+            changed = dist_updated ? true : changed;
           }    
         }
       }
       R.clear();
+      if(!changed) break;
 
     }
     }
