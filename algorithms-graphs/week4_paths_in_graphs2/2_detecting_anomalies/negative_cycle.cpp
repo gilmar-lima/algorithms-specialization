@@ -8,48 +8,55 @@
 using namespace std;
 
 int negative_cycle(vector<vector<int> > &adj, vector<vector<int> > &cost) {
-  vector<int> dist (adj.size(), 0);
-  int s= 0;
-  dist[s] = 0;
-  queue<int> node_queue;
+  queue<int> node_queue; 
+  vector<bool> visited (adj.size(), false); 
   
+  for(int vertex = 0; vertex < adj.size(); vertex++){
+    if(visited[vertex] == false){
+      vector<int> dist (adj.size(), INT_MAX);
+      dist[vertex]  = 0;
 
-  for(size_t r = 0; r < adj.size() - 1; r++){
+      for(size_t r = 0; r < adj.size() - 1; r++){
 
-    unordered_set<int> R;
-    node_queue.push(s);
+      unordered_set<int> R;
+      node_queue.push(vertex);
+      visited[vertex] = true;
 
-    while (!node_queue.empty()){
-      
-      int u = node_queue.front();
-      node_queue.pop();
+      while (!node_queue.empty()){
+        
+        int u = node_queue.front();
+        node_queue.pop();
 
-      for(size_t i = 0; i < adj[u].size(); i++){
-        int v = adj[u][i];
-        int previous = dist[v];
+        for(size_t i = 0; i < adj[u].size(); i++){
+          int v = adj[u][i];
+          int previous = dist[v];
 
-        //MAke the calculations only for nodes not visited
-        unordered_set<int>::const_iterator item = R.find(v);
-        if(item == R.end()){
-          R.insert(v);
+          //MAke the calculations only for nodes not visited
+          unordered_set<int>::const_iterator item = R.find(v);
+          if(item == R.end()){
+            R.insert(v);
 
-          node_queue.push(v);
-          dist[v] = min(dist[v], dist[u] + cost[u][i]);
+            node_queue.push(v);
+            visited[vertex] = true;
+            dist[v] = min(dist[v], dist[u] + cost[u][i]);
 
-          //check if value was updated on last iteration
-          bool is_last_iteration = r == adj.size() - 2;
-          bool dist_updated = dist[v] < previous;
+            //check if value was updated on last iteration
+            bool is_last_iteration = r == adj.size() - 2;
+            bool dist_updated = dist[v] < previous;
 
-          if(is_last_iteration && dist_updated){
-            return 1;
-          } 
-        }    
+            if(is_last_iteration && dist_updated){
+              return 1;
+            } 
+          }    
+        }
       }
+      R.clear();
 
     }
-    R.clear();
-
+    }
   }
+
+  
 
   
   return 0;
