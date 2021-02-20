@@ -8,12 +8,10 @@
 using namespace std;
 
 int negative_cycle(vector<vector<int> > &adj, vector<vector<int> > &cost) {
-  vector<int> dist (adj.size(), INT_MAX);
+  vector<int> dist (adj.size(), 0);
   int s= 0;
   dist[s] = 0;
   queue<int> node_queue;
-  
-  
   
 
   for(size_t r = 0; r < adj.size() - 1; r++){
