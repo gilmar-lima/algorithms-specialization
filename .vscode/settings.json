@@ -1,5 +1,10 @@
 {
         "files.associations": {
-                "ctime": "cpp"
+                "ctime": "cpp",
+                "iomanip": "cpp",
+                "unordered_set": "cpp",
+                "vector": "cpp",
+                "queue": "cpp",
+                "iterator": "cpp"
         }
 }
