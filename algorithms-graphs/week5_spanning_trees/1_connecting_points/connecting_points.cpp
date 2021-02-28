@@ -61,27 +61,28 @@ double minimum_distance(vector<int> x, vector<int> y) {
 
   V[0].cost = 0.0;
   H.push(V[0]);
+  R.insert(0);
   
   while(H.size() > 0){
     point v = H.top();
-    H.pop();    
-    unordered_set<int>::const_iterator item = R.find(v.value);
-    
-    R.insert(v.value);
-
-    //vertex already explored
-    if(item != R.end()) continue;
+    H.pop();
+    R.insert(v.value);   
 
     for (size_t i = 0; i < V.size() ; i++)
     {
+      point* z = &V[i];
+      //vertex already explored
+      unordered_set<int>::const_iterator item = R.find(z->value);
+      if(item != R.end()) continue;
+
       //skip reference to self vertex
       if( i == v.value) continue;
-      point* z = &V[i];
+
       double weight_v_z = distance(v,*z);
 
       if (z->cost > weight_v_z){
         z->cost = weight_v_z;
-        z->prev = i;
+        z->prev = v.value;
         H.push(*z);
       }
     }
