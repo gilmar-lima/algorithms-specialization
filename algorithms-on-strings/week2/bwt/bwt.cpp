@@ -9,10 +9,17 @@ using std::endl;
 using std::string;
 using std::vector;
 
-string BWT(const string& text) {
+string BWT(string& text) {
   string result = "";
+  vector<string> M;
 
-  // write your code here
+  for (size_t i = 0; i < text.size(); i++)
+  {
+    M.push_back(text);
+    rotate(text.begin(), text.begin()+text.size()-1, text.end());
+  }
+  sort(M.begin(), M.end());
+  for (auto &&str : M) result.push_back(str.back());
 
   return result;
 }
