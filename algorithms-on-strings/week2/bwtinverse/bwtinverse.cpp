@@ -19,19 +19,7 @@ vector<string> parse_column(const string& text){
       count++;           
     }
     occurrence[text[i]] = count;
-    column.push_back(text[i] + to_string(count));
-  }
-  
-
-  for (auto &&element : text)
-  {
-    int count  = 1;
-    if(occurrence.count(element) != 0){
-      count = occurrence.find(element)->second;
-      count++;           
-    }
-    occurrence[element] = count;
-    column.push_back(element + to_string(count));
+    column[i] = text[i] + to_string(count);
   }
 
   return column;  
@@ -46,7 +34,7 @@ unordered_map<string,string> map_column(vector<string> column1, vector<string> c
 } 
 
 string InverseBWT(const string& bwt) {
-  string text = "";
+  
   string bwt_ordered = bwt;
   sort(bwt_ordered.begin(), bwt_ordered.end());
 
@@ -55,15 +43,14 @@ string InverseBWT(const string& bwt) {
 
   unordered_map<string,string> first_to_last = map_column(first_column,last_column);
   string first_match = first_column[0];
-    
-  for (size_t i = 0; i < bwt_ordered.size(); i++)
-  {
-    text = text + first_match[0];
-    first_match = first_to_last.find(first_match)->second;    
-  }
+  string text  = bwt;
 
-  reverse(text.begin(),text.end());  
-    
+  for (int i = bwt.size() - 1; i >= 0; i--)
+  {
+    text[i] =  first_match[0];
+    first_match = first_to_last.find(first_match)->second;
+  }
+     
   return text;
 }
 
