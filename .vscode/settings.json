@@ -59,6 +59,17 @@
                 "typeinfo": "cpp",
                 "forward_list": "cpp",
                 "regex": "cpp",
-                "valarray": "cpp"
+                "valarray": "cpp",
+                "csetjmp": "cpp",
+                "csignal": "cpp",
+                "cfenv": "cpp",
+                "codecvt": "cpp",
+                "condition_variable": "cpp",
+                "cuchar": "cpp",
+                "random": "cpp",
+                "future": "cpp",
+                "mutex": "cpp",
+                "scoped_allocator": "cpp",
+                "shared_mutex": "cpp"
         }
 }

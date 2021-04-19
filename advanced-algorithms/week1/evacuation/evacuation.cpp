@@ -1,84 +1,83 @@
 #include <iostream>
 #include <vector>
+#include <climits>
+#include <queue>
+
+using namespace std;
 
 using std::vector;
 
-/* This class implements a bit unusual scheme for storing edges of the graph,
- * in order to retrieve the backward edge for a given edge quickly. */
-class FlowGraph {
-public:
-    struct Edge {
-        int from, to, capacity, flow;
-    };
+vector<vector<int> > adj;
+vector<vector<int>> capacity;
 
-private:
-    /* List of all - forward and backward - edges */
-    vector<Edge> edges;
+int bfs(int s, int t, vector<int>& parent) {
+				fill(parent.begin(), parent.end(), -1);
+				parent[s] = -2;
+				queue<pair<int, int>> q;
+				q.push({s, INT_MAX});
 
-    /* These adjacency lists store only indices of edges in the edges list */
-    vector<vector<size_t> > graph;
+				while (!q.empty()) {
+								int cur = q.front().first;
+								int flow = q.front().second;
+								q.pop();
 
-public:
-    explicit FlowGraph(size_t n): graph(n) {}
+								for (int next : adj[cur]) {
+												if (parent[next] == -1 && capacity[cur][next]) {
+																parent[next] = cur;
+																int new_flow = min(flow, capacity[cur][next]);
+																if (next == t)
+																				return new_flow;
+																q.push({next, new_flow});
+												}
+								}
+				}
 
-    void add_edge(int from, int to, int capacity) {
-        /* Note that we first append a forward edge and then a backward edge,
-         * so all forward edges are stored at even indices (starting from 0),
-         * whereas backward edges are stored at odd indices in the list edges */
-        Edge forward_edge = {from, to, capacity, 0};
-        Edge backward_edge = {to, from, 0, 0};
-        graph[from].push_back(edges.size());
-        edges.push_back(forward_edge);
-        graph[to].push_back(edges.size());
-        edges.push_back(backward_edge);
-    }
-
-    size_t size() const {
-        return graph.size();
-    }
-
-    const vector<size_t>& get_ids(int from) const {
-        return graph[from];
-    }
-
-    const Edge& get_edge(size_t id) const {
-        return edges[id];
-    }
-
-    void add_flow(size_t id, int flow) {
-        /* To get a backward edge for a true forward edge (i.e id is even), we should get id + 1
-         * due to the described above scheme. On the other hand, when we have to get a "backward"
-         * edge for a backward edge (i.e. get a forward edge for backward - id is odd), id - 1
-         * should be taken.
-         *
-         * It turns out that id ^ 1 works for both cases. Think this through! */
-        edges[id].flow += flow;
-        edges[id ^ 1].flow -= flow;
-    }
-};
-
-FlowGraph read_data() {
-    int vertex_count, edge_count;
-    std::cin >> vertex_count >> edge_count;
-    FlowGraph graph(vertex_count);
-    for (int i = 0; i < edge_count; ++i) {
-        int u, v, capacity;
-        std::cin >> u >> v >> capacity;
-        graph.add_edge(u - 1, v - 1, capacity);
-    }
-    return graph;
+				return 0;
 }
 
-int max_flow(FlowGraph& graph, int from, int to) {
-    int flow = 0;
-    /* your code goes here */
-    return flow;
+int maxflow(int s, int t) {
+				int flow = 0;
+				vector<int> parent(adj.size());
+				int new_flow;
+
+				while (new_flow = bfs(s, t, parent)) {
+								flow += new_flow;
+								int cur = t;
+								while (cur != s) {
+												int prev = parent[cur];
+												capacity[prev][cur] -= new_flow;
+												capacity[cur][prev] += new_flow;
+												cur = prev;
+								}
+				}
+
+				return flow;
+}
+
+void read_data() {
+				int vertex_count, edge_count;
+				std::cin >> vertex_count >> edge_count;
+				
+				vector<vector<int> > adj_input(vertex_count, vector<int>());
+				vector<vector<int> > capacity_input(vertex_count, vector<int>(vertex_count,0));
+
+				adj = adj_input;
+				capacity = capacity_input;
+
+				for (int i = 0; i < edge_count; ++i) {
+						int x, y, edge_capacity;
+						std::cin >> x >> y >> edge_capacity;
+						adj[x - 1].push_back(y - 1);
+						capacity[x - 1][y - 1] =  edge_capacity + capacity[x - 1][y - 1];
+						adj[y - 1].push_back(x - 1);
+				}
+				
 }
 
 int main() {
-    std::ios_base::sync_with_stdio(false);
-    FlowGraph graph = read_data();
+				std::ios_base::sync_with_stdio(false);
+				read_data();
 
-    std::cout << max_flow(graph, 0, graph.size() - 1) << "\n";
-    return 0;
+				std::cout << maxflow(0, adj.size() - 1) << "\n";
+				return 0;
 }
