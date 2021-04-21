@@ -5,10 +5,9 @@
 
 using namespace std;
 
-using std::vector;
-
 vector<vector<int> > adj;
 vector<vector<int>> capacity;
+vector<vector<int>> flows;
 
 int bfs(int s, int t, vector<int>& parent) {
 				fill(parent.begin(), parent.end(), -1);
@@ -46,6 +45,7 @@ int maxflow(int s, int t) {
 								while (cur != s) {
 												int prev = parent[cur];
 												capacity[prev][cur] -= new_flow;
+												flows[prev][cur] += new_flow;
 												capacity[cur][prev] += new_flow;
 												cur = prev;
 								}
@@ -63,6 +63,7 @@ void read_data() {
 
 				adj = adj_input;
 				capacity = capacity_input;
+				flows = capacity_input;
 
 				for (int i = 0; i < edge_count; ++i) {
 						int x, y, edge_capacity;
