@@ -21,17 +21,17 @@ pair<int, vector<double>> solve_diet_problem(
 int main(){
   int n, m;
   cin >> n >> m;
-  matrix A(n, vector<double>(m));
+  matrix A(n, vector<float>(m));
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < m; j++) {
       cin >> A[i][j];
     }
   }
-  vector<double> b(n);
+  vector<float> b(n);
   for (int i = 0; i < n; i++) {
     cin >> b[i];
   }
-  vector<double> c(m);
+  vector<float> c(m);
   for (int i = 0; i < m; i++) {
     cin >> c[i];
   }
