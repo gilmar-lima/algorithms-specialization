@@ -218,7 +218,7 @@ class Simplex {
         positiveValues[i] = A[i][pivotColumn];
       } else {
         positiveValues[i] = 0;
-        negativeValueCount += 1;
+        negativeValueCount++;
       }
     }
     // checking the unbound condition if all the values are negative ones

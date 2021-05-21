@@ -2,49 +2,47 @@
 #include <iostream>
 #include <vector>
 #include <numeric>
+#include <cfloat>
+#include <math.h>
 using namespace std;
-
-/*
-The main method is in this program itself.
-Instructions for compiling=>>
-Run on any gcc compiler=>>
-Special***** should compile in -std=c++11 or C++14 -std=gnu++11  *********  (mat
-be other versions syntacs can be different) turorials point online compiler
-==> go ti link   http://cpp.sh/ or
-https://www.tutorialspoint.com/cplusplus/index.htm and click try it(scorel
-below) and after go to c++ editor copy code and paste. after that click button
-execute. if you have -std=c++11 you can run in command line; g++ -o output
-Simplex.cpp
-./output
-How to give inputs to the program =>>>
-   Example:
-        colSizeA = 6 // input colmn size
-        rowSizeA = 3  // input row size
-    float C[N]={-6,-5,-4,0,0,0};  //Initialize the C array  with the
-coefficients of the constraints of the objective function float
-B[M]={240,360,300};//Initialize the B array constants of the constraints
-respectively
-   //initialize the A array by giving all the coefficients of all the variables
-   float A[M][N] =  {
-                 { 2,  1,  1,   1,  0, 0},
-                { 1,  3,  2,   0,  1, 0 },
-                {   2,    1,  2,   0,  0,  1}
-                };
-*/
-
 class Simplex {
  private:
   int rows, cols;
   // stores coefficients of all the variables
-  std::vector<std::vector<float> > A;
+  vector<std::vector<float> > A;
   // stores constants of constraints
-  std::vector<float> B;
+  vector<float> B;
   // stores the coefficients of the objective function
-  std::vector<float> C;
+  vector<float> C;
 
   float maximum;
   bool isUnbounded;
 	int n, m;
+
+  vector<float> get_results(){
+
+    vector<float> result;
+
+    for (int i = 0; i < A[0].size(); i++) {  // every basic column has the values, get it form B array
+      int count0 = 0;
+      int index = 0;
+      for (int j = 0; j < rows; j++) {
+        if (A[j][i] == 0.0) {
+          count0 += 1;
+        } else if (A[j][i] == 1) {
+          index = j;
+        }
+      }
+
+      if (count0 == rows - 1) {
+        result.push_back(B[index]); 
+      } else {
+        result.push_back(0); 
+      }
+    }
+
+    return result;
+  }
 
  public:
   Simplex(std::vector<std::vector<float> > matrix, std::vector<float> b,
@@ -74,45 +72,36 @@ class Simplex {
   }
 
   bool simplexAlgorithmCalculataion() {
-    // check whether the table is optimal,if optimal no need to process further
-    if (checkOptimality() == true) {
-      return true;
-    }
 
-    // find the column which has the pivot.The least coefficient of the
-    // objective function(C array).
+    if (checkOptimality()) return true;
+    
     int pivotColumn = findPivotColumn();
 
-    // find the row with the pivot value.The least value item's row in the B
-    // array
     int pivotRow = findPivotRow(pivotColumn);
 
 		if (isUnbounded == true) {
       return true;
     }
 
-    // form the next table according to the pivot value
     doPivotting(pivotRow, pivotColumn);
 
     return false;
   }
 
   bool checkOptimality() {
-    // if the table has further negative constraints,then it is not optimal
+
     bool isOptimal = false;
     int positveValueCount = 0;
 
-    // check if the coefficients of the objective function are negative
     for (int i = 0; i < C.size(); i++) {
       float value = C[i];
       if (value >= 0) {
         positveValueCount++;
       }
     }
-    // if all the constraints are positive now,the table is optimal
+
     if (positveValueCount == C.size()) {
       isOptimal = true;
-      //print();
     }
     return isOptimal;
   }
@@ -150,8 +139,6 @@ class Simplex {
         for (int p = 0; p < cols; p++) {
           float multiplyValue = pivotColVals[m];
           A[m][p] = A[m][p] - (multiplyValue * rowNew[p]);
-          // C[p] = C[p] - (multiplyValue*C[pivotRow]);
-          // B[i] = B[i] - (multiplyValue*B[pivotRow]);
         }
       }
     }
@@ -175,18 +162,6 @@ class Simplex {
       A[pivotRow][i] = rowNew[i];
     }
   }
-
-  // print the current A array
-  /*void print(){
-      for(int i=0; i<rows;i++){
-          for(int j=0;j<cols;j++){
-              cout<<A[i][j] <<" ";
-          }
-          cout<<""<<endl;
-      }
-      cout<<""<<endl;
-  }*/
-
   // find the least coefficients of constraints in the objective function's
   // position
   int findPivotColumn() {
@@ -233,15 +208,12 @@ class Simplex {
       }
     }
     // find the minimum's location of the smallest item of the B array
-    float minimum = 99999999;
+    float minimum = FLT_MAX;
     int location = 0;
-    for (int i = 0; i < sizeof(result) / sizeof(result[0]); i++) {
-      if (result[i] > 0) {
-        if (result[i] < minimum) {
-          minimum = result[i];
-
-          location = i;
-        }
+    for (int i = 0; i < B.size(); i++) {
+      if (result[i] > 0 && result[i] < minimum) {
+        minimum = result[i];
+        location = i;
       }
     }
 
@@ -256,19 +228,19 @@ class Simplex {
       if (result == true) end = true;
     }
 
-		 
+    vector<float> results = get_results();		 
 
 		if(isUnbounded){
 			cout << "Infinity\n";
 		}else{
-			double sum_solutions = accumulate(C.begin(), C.end(),0);
+			double sum_solutions = accumulate(results.begin(), results.end(),0);
 
-			if(sum_solutions <= 1.0e9){
-				printf("Bounded solution\n");
-      	for (float result : C) printf("%.18f ", result);
+			if(round(maximum) != 1.0){
+				cout << "Bounded solution\n";
+      	for (int i = 0; i<(m - n); i++) printf("%.18f ", results[i]);
 				cout << "\n";
 			}else{
-				cout << "Infinity\n";
+				cout << "No solution\n";
 			}			
       
 		}
@@ -276,9 +248,16 @@ class Simplex {
   }
 };
 
-void augment_A( vector<vector<float> > &A){
-	for (int i = 0, j = A.size(); i < A.size(); i++, j++){
+void augment_A( vector<vector<float> > &A, int num_variables){
+	for (int i = 0, j = num_variables; i < A.size(); i++, j++){
 		A[i][j] = 1;    
+	}
+}
+
+void invert_line( vector<vector<float> > &A, int line){
+
+  for (int j = 0; j < A[0].size(); j++){
+		A[line][j] = -1*A[line][j];    
 	}
 }
 
@@ -292,12 +271,17 @@ int main() {
     }
   }
 
-	augment_A(A);
+	augment_A(A,m);
 
   vector<float> b(n);
   for (int i = 0; i < n; i++) {
     cin >> b[i];
+    if(b[i]<0){
+      b[i] = -b[i];
+      invert_line(A,i);
+    }
   }
+
   vector<float> c(m + n, 0);
   for (int i = 0; i < m; i++) {
 		float input;
@@ -305,8 +289,6 @@ int main() {
     c[i] = input*(-1);
   }
 
-  // hear the make the class parameters with A[m][n] vector b[] vector and c[]
-  // vector
   Simplex simplex(A, b, c);
   simplex.CalculateSimplex();
 
