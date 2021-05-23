@@ -67,7 +67,7 @@ pair<int, vector<double>> solve_diet_problem(
 }
 
 bool value_in_vector(int value, vector<int> vec){
-  for(auto element : vec) if(element == value) return true;
+  for(int element : vec) if(element == value) return true;
   return false;
 }
 
@@ -76,15 +76,12 @@ bool satisfy_inequalities(matrix A, vector<double> b,solution ans){
   unordered_set<int> equations;
   for(auto element : ans.equations) equations.insert(element);
 
-  unordered_set<int>::const_iterator got;
-
   for (size_t i = 0; i < A.size(); i++)
   {
-    got = equations.find(i);
-    bool ignore_equation = got != equations.end();
+    bool ignore_equation = equations.find(i) != equations.end();
     if(ignore_equation) continue;
     
-    double product = dot_product(A[i],b);
+    double product = dot_product(A[i],ans.values);
     if(product > b[i]) return false;
   }
   return true;
