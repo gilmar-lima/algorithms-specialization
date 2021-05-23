@@ -117,7 +117,7 @@ void augment_A( matrix &A){
   int num_variables = A[0].size();
 	for (int i = 0; i < num_variables; i++){
     vector<double> zero_ineq(num_variables,0);
-    zero_ineq[i] = 1;
+    zero_ineq[i] = -1;
 		A.push_back(zero_ineq);    
 	}
   
