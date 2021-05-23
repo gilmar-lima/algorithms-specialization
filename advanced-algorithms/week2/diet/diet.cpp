@@ -2,6 +2,9 @@
 #include <iostream>
 #include <vector>
 #include <cstdio>
+#include <queue>
+#include <unordered_set>
+
 using namespace std;
 
 typedef vector<vector<double>> matrix;
@@ -9,12 +12,23 @@ typedef vector<vector<double>> matrix;
 const double EPS = 1e-6;
 const int INF = -1;
 
+struct solution{
+  double maximum;
+  vector<double> values;
+  vector<int> equations;
+};
+
 void augment_A( matrix &A);
 void augment_b(vector<double> &b, int num_variables);
 int gauss (matrix a, vector<double> & ans);
 vector< vector<int> > get_ineq_subsets(int num_inequalites, int num_variables);
 matrix subset_matrix(matrix A, vector<int> set);
 vector<double> subset_vector(vector<double> b, vector<int> set);
+double dot_product(vector<double> a, vector<double> b);
+bool comparison(solution a, solution b);
+matrix combine(matrix A, vector<double> b);
+bool satisfy_inequalities(matrix A, vector<double> b,solution ans);
+bool value_in_vector(int value, vector<int> vec);
 
 pair<int, vector<double>> solve_diet_problem(
     int n, 
@@ -25,15 +39,73 @@ pair<int, vector<double>> solve_diet_problem(
 
   augment_A(A);
   augment_b(b,m);
+  matrix A_combined = combine(A,b);
 
-  for(auto subset : get_ineq_subsets(n+m,m)){
-    matrix A_subsetted = subset_matrix(A,subset);
-    vector<double> b_subsetted = subset_vector(b,subset);
+  auto comparison = [](solution a, solution b){
+      return a.maximum < b.maximum;          
+  }; 
+  priority_queue<solution, vector<solution>, decltype(comparison)> solutions (comparison);
 
+  for(auto subset : get_ineq_subsets(A_combined.size(),m)){
+    matrix A_subsetted = subset_matrix(A_combined,subset);
+    vector<double> ans(m,0);
+    int solution_type = gauss(A_subsetted,ans);
+    solution result {dot_product(c,ans),ans,subset};
+    
+    if(solution_type != 1) continue;   
+    if(!satisfy_inequalities(A,b,result)) continue;
 
+    solutions.push(result);    
   }
+
+  if(solutions.size() == 0) return {-1, vector<double>(m, 0)};
+
+  int infinity_equantion = A.size()-1;
+  if(value_in_vector(infinity_equantion, solutions.top().equations)) return {1, vector<double>(m, 0)};  
   
-  return {0, vector<double>(m, 0)};
+  return {0, solutions.top().values};
+}
+
+bool value_in_vector(int value, vector<int> vec){
+  for(auto element : vec) if(element == value) return true;
+  return false;
+}
+
+bool satisfy_inequalities(matrix A, vector<double> b,solution ans){
+
+  unordered_set<int> equations;
+  for(auto element : ans.equations) equations.insert(element);
+
+  unordered_set<int>::const_iterator got;
+
+  for (size_t i = 0; i < A.size(); i++)
+  {
+    got = equations.find(i);
+    bool ignore_equation = got != equations.end();
+    if(ignore_equation) continue;
+    
+    double product = dot_product(A[i],b);
+    if(product > b[i]) return false;
+  }
+  return true;
+}
+
+matrix combine(matrix A, vector<double> b){
+
+  for (size_t i = 0; i < b.size(); i++)
+  {
+    A[i].push_back(b[i]);
+  }
+  return A;  
+}
+
+double dot_product(vector<double> a, vector<double> b){
+  double accumulator = 0;
+  for (size_t i = 0; i < a.size(); i++)
+  {
+    accumulator = accumulator + a[i]*b[i];
+  }
+  return accumulator;
 }
 
 matrix subset_matrix(matrix A, vector<int> set){
@@ -41,13 +113,6 @@ matrix subset_matrix(matrix A, vector<int> set){
 
   for(auto element : set) filtered_matrix.push_back(A[element]);
   return filtered_matrix;
-}
-
-vector<double> subset_vector(vector<double> b, vector<int> set){
-  vector<double> filtered_vector;
-
-  for(auto element : set) filtered_vector.push_back(b[element]);
-  return filtered_vector;
 }
 
 void augment_A( matrix &A){
@@ -58,6 +123,9 @@ void augment_A( matrix &A){
     zero_ineq[i] = 1;
 		A.push_back(zero_ineq);    
 	}
+  
+  vector<double> infinity_ineq (A[0].size(),1);
+  A.push_back(infinity_ineq);
 }
 
 void augment_b(vector<double> &b, int num_variables){
@@ -66,6 +134,9 @@ void augment_b(vector<double> &b, int num_variables){
 	for (int i = num_ineq; i < num_variables+num_ineq; i++){
 		b.push_back(0);    
 	}
+
+  //infinity
+  b.push_back(1.0e9);
 }
 
 int gauss (matrix a, vector<double> & ans) {
