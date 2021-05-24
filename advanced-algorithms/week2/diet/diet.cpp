@@ -29,7 +29,6 @@ bool comparison(solution a, solution b);
 matrix combine(matrix A, vector<double> b);
 bool satisfy_inequalities(matrix A, vector<double> b,solution ans);
 bool value_in_vector(int value, vector<int> vec);
-bool all_values_positive(vector<double> vec);
 
 pair<int, vector<double>> solve_diet_problem(
     int n, 
@@ -53,9 +52,8 @@ pair<int, vector<double>> solve_diet_problem(
     int solution_type = gauss(A_subsetted,ans);
     solution result {dot_product(c,ans),ans,subset};
     
-    if(solution_type == 0) continue;   
-    if(!satisfy_inequalities(A,b,result)) continue;    
-    //if(!all_values_positive(result.values)) continue;
+    if(solution_type != 1) continue;   
+    if(!satisfy_inequalities(A,b,result)) continue;
 
     solutions.push(result);    
   }
@@ -66,11 +64,6 @@ pair<int, vector<double>> solve_diet_problem(
   if(value_in_vector(infinity_equantion, solutions.top().equations)) return {1, vector<double>(m, 0)};  
   
   return {0, solutions.top().values};
-}
-
-bool all_values_positive(vector<double> vec){
-  for(auto element : vec) if(element < 0.0) return false;
-  return true;
 }
 
 bool value_in_vector(int value, vector<int> vec){
@@ -90,7 +83,6 @@ bool satisfy_inequalities(matrix A, vector<double> b,solution ans){
     
     double product = dot_product(A[i],ans.values);
     if(product > b[i]) return false;
-
   }
   return true;
 }
