@@ -9,7 +9,7 @@ using namespace std;
 
 typedef vector<vector<double>> matrix;
 
-const double EPS = 1e-6;
+const double EPS = 1e-2;
 const int INF = -1;
 
 struct solution{
