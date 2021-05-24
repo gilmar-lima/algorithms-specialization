@@ -52,7 +52,7 @@ pair<int, vector<double>> solve_diet_problem(
     int solution_type = gauss(A_subsetted,ans);
     solution result {dot_product(c,ans),ans,subset};
     
-    if(solution_type != 1) continue;   
+    if(solution_type == 0) continue;   
     if(!satisfy_inequalities(A,b,result)) continue;
 
     solutions.push(result);    
