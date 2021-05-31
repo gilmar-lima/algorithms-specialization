@@ -41,7 +41,7 @@ struct ConvertGSMNetworkProblemToSat {
 		clauses.insert(clauses.end(), color_clauses.begin(), color_clauses.end());
 
 		print_clauses(clauses, numVertices);
-		print_clauses_file(clauses, numVertices);
+		//print_clauses_file(clauses, numVertices);
 	}
 };
 
@@ -83,9 +83,11 @@ int_matrix create_color_clauses(int num_vertices, int_matrix table){
 	int_matrix clauses;
 	for (size_t vertex = 1; vertex <= num_vertices; vertex++)
 	{
-		clauses.push_back({table[vertex-1][0], -table[vertex-1][1], -table[vertex-1][2]});
-		clauses.push_back({-table[vertex-1][0], table[vertex-1][1], -table[vertex-1][2]});
-		clauses.push_back({-table[vertex-1][0], -table[vertex-1][1], table[vertex-1][2]});
+		clauses.push_back({table[vertex-1][0], table[vertex-1][1], table[vertex-1][2]});
+		clauses.push_back({-table[vertex-1][0], -table[vertex-1][1]});
+		clauses.push_back({-table[vertex-1][0], -table[vertex-1][2]});
+		clauses.push_back({-table[vertex-1][1], -table[vertex-1][2]});
+
 	}
 	return clauses;
 }
@@ -97,7 +99,6 @@ int_matrix create_relation_clauses(vector<Edge> edges, int_matrix table){
 	for(Edge e : edges){
 		for (size_t color = 1; color <= NUM_COLORS; color++)
 		{
-			clauses.push_back({table[e.from-1][color-1], table[e.to-1][color-1]});
 			clauses.push_back({-table[e.from-1][color-1], -table[e.to-1][color-1]});			
 		}
 	}
