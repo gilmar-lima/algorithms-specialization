@@ -1,6 +1,7 @@
 #include <ios>
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -15,7 +16,9 @@ struct Edge {
 vector<vector<int>> create_index_table(int num_vertices);
 int_matrix create_relation_clauses(vector<Edge> edges, int_matrix table);
 int_matrix create_color_clauses(int num_vertices, int_matrix table);
-void print_clauses(int_matrix clauses);
+void print_clauses(int_matrix clauses, int num_vertices);
+void print_clauses_file(int_matrix clauses, int num_vertices);
+
 struct ConvertGSMNetworkProblemToSat {
 	int numVertices;
 	vector<Edge> edges;
@@ -37,17 +40,41 @@ struct ConvertGSMNetworkProblemToSat {
 		clauses.insert(clauses.begin(),relation_clauses.begin(), relation_clauses.end());
 		clauses.insert(clauses.end(), color_clauses.begin(), color_clauses.end());
 
-		print_clauses(clauses);
+		print_clauses(clauses, numVertices);
+		print_clauses_file(clauses, numVertices);
 	}
 };
 
-void print_clauses(int_matrix clauses){
+void print_clauses_file(int_matrix clauses, int num_vertices){
+
+	int num_variables = num_vertices*NUM_COLORS;	
+	ofstream file;
+	file.open("clauses.cnf");
+
+	file << "p cnf ";
+	file << num_variables;
+	file <<" "<< clauses.size() << endl;
 
 	for(auto clause : clauses){
 		for(auto variable : clause){
-			cout << variable << ' ';
+			file << variable << ' ';
 		}
-		cout << endl;
+		file << "0" << endl;
+	}
+	file.close();
+}
+
+void print_clauses(int_matrix clauses, int num_vertices){
+
+	int num_variables = num_vertices*NUM_COLORS;
+	cout << clauses.size() << " ";
+	cout << num_variables << endl;
+
+	for(auto clause : clauses){
+		for(auto variable : clause){
+			cout << variable << " ";
+		}
+		cout << "0" << endl;
 	}
 }
 
