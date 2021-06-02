@@ -1,11 +1,20 @@
 #include <bits/stdc++.h>
+#include <ios>
+#include <iostream>
+#include <vector>
+#include <fstream>
+
 using namespace std;
+
+typedef vector<vector<int>> int_matrix;
 
 struct Edge {
     int from;
     int to;
 };
 
+int_matrix create_index_table(int num_vertices);
+int_matrix create_appear_clauses(const int_matrix variables_table);
 struct ConvertHampathToSat {
     int numVertices;
     vector<Edge> edges;
@@ -16,15 +25,62 @@ struct ConvertHampathToSat {
     {  }
 
     void printEquisatisfiableSatFormula() {
-        // This solution prints a simple satisfiable formula
-        // and passes about half of the tests.
-        // Change this function to solve the problem.
-        cout << "3 2" << endl;
-        cout << "1 2 0" << endl;
-        cout << "-1 -2 0" << endl;
-        cout << "1 -2 0" << endl;
+
+        int_matrix variables_table = create_index_table(numVertices);
+        
+
     }
 };
+
+int_matrix create_appear_twice_clauses(const int_matrix variables_table){
+
+	int_matrix clauses;
+	vector<int> clause (variables_table.size(),0);
+	
+	for (size_t j = 0; j < variables_table.size(); j++)
+	{
+		for (size_t i = 0; i < variables_table[0].size(); i++)
+		{
+			clause[i] = variables_table[i][j];
+		}
+		clauses.push_back(clause);		
+	}
+	return clauses;
+}
+
+int_matrix create_appear_clauses(const int_matrix variables_table){
+
+	int_matrix clauses;
+	
+	
+	for (size_t j = 0; j < variables_table[0].size(); j++)
+	{
+		for (size_t inner_limit = 0; inner_limit < variables_table.size(); inner_limit++)
+		{
+			for (size_t i = inner_limit; i < variables_table.size(); i++)
+			{
+				clauses.push_back({-variables_table[inner_limit][j],-variables_table[i][j]});
+			}
+			
+		}
+	}
+	return clauses;
+}
+
+int_matrix create_index_table(int num_vertices){
+
+	vector<int> row (num_vertices,0);
+	int_matrix table (num_vertices,row);
+
+	for (int i = 0, num_variable = 1; i < num_vertices; i++)
+	{
+		for(int j = 0; j < num_vertices; j++){
+			table[i][j] = num_variable;
+			num_variable++;			
+		}
+	}
+	return table;	
+}
 
 int main() {
     ios::sync_with_stdio(false);
