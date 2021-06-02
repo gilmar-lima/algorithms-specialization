@@ -50,16 +50,15 @@ int_matrix create_appear_twice_clauses(const int_matrix variables_table){
 
 int_matrix create_appear_clauses(const int_matrix variables_table){
 
-	int_matrix clauses;
-	
+	int_matrix clauses;	
 	
 	for (size_t j = 0; j < variables_table[0].size(); j++)
 	{
-		for (size_t inner_limit = 0; inner_limit < variables_table.size(); inner_limit++)
+		for (size_t i = 0; i < variables_table.size(); i++)
 		{
-			for (size_t i = inner_limit; i < variables_table.size(); i++)
+			for (size_t k = i+1; k < variables_table.size(); k++)
 			{
-				clauses.push_back({-variables_table[inner_limit][j],-variables_table[i][j]});
+				clauses.push_back({-variables_table[i][j],-variables_table[k][j]});
 			}
 			
 		}
