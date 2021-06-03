@@ -16,6 +16,7 @@ struct Edge {
 int_matrix create_index_table(int num_vertices);
 int_matrix create_appear_clauses(const int_matrix variables_table);
 int_matrix create_every_position_clauses(const int_matrix variables_table);
+int_matrix create_two_nodes_clauses(const int_matrix variables_table);
 struct ConvertHampathToSat {
     int numVertices;
     vector<Edge> edges;
@@ -32,6 +33,23 @@ struct ConvertHampathToSat {
 
     }
 };
+
+int_matrix create_two_nodes_clauses(const int_matrix variables_table){
+
+	int_matrix clauses;	
+	
+	for (size_t i = 0; i < variables_table.size(); i++)
+	{
+		for (size_t j = 0; j < variables_table[0].size(); j++)
+		{
+			for (size_t k = j+1; k < variables_table[0].size(); k++)
+			{
+				clauses.push_back({-variables_table[i][j],-variables_table[i][k]});
+			}			
+		}
+	}
+	return clauses;
+}
 
 int_matrix create_every_position_clauses(const int_matrix variables_table){
 
