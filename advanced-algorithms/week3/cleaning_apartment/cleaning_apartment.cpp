@@ -51,7 +51,7 @@ struct ConvertHampathToSat {
 			clauses.insert(clauses.end(),nonadjacent_nodes_clauses.begin(), nonadjacent_nodes_clauses.end());
 
 			print_clauses(clauses, numVertices);
-			print_clauses_file(clauses, numVertices);
+			//print_clauses_file(clauses, numVertices);
 		}
 };
 
@@ -183,12 +183,13 @@ int_matrix create_nonadjacent_nodes_clauses(const int_matrix variables_table, ve
 		for (size_t i = 0; i < variables_table.size(); i++)
 		{
 			if(i == j) continue;
-			for (size_t k = 0; k < variables_table.size() - 1; k++)
-			{
-				set_iterator = graph_pairs.find(to_string(i+1)+'-'+to_string(j+1));
-				bool pair_in_graph = set_iterator != graph_pairs.end();
 
-				if(pair_in_graph) continue;				
+			set_iterator = graph_pairs.find(to_string(i+1)+'-'+to_string(j+1));
+			bool pair_in_graph = set_iterator != graph_pairs.end();
+			if(pair_in_graph) continue;
+
+			for (size_t k = 0; k < variables_table.size() - 1; k++)
+			{								
 				clauses.push_back({-variables_table[k][i],-variables_table[k+1][j]});
 			}			
 		}
