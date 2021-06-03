@@ -20,6 +20,9 @@ int_matrix create_every_position_clauses(const int_matrix variables_table);
 int_matrix create_two_nodes_clauses(const int_matrix variables_table);
 int_matrix create_appear_twice_clauses(const int_matrix variables_table);
 unordered_set<string> pairs_in_graph(vector<Edge> edges);
+int_matrix create_nonadjacent_nodes_clauses(const int_matrix variables_table, vector<Edge> edges);
+void print_clauses(int_matrix clauses, int num_vertices);
+void print_clauses_file(int_matrix clauses, int num_vertices);
 struct ConvertHampathToSat {
     int numVertices;
     vector<Edge> edges;
@@ -31,22 +34,59 @@ struct ConvertHampathToSat {
 
     void printEquisatisfiableSatFormula() {
 
-        int_matrix variables_table = create_index_table(numVertices);
-				int_matrix two_nodes_clauses = create_two_nodes_clauses(variables_table);
-				int_matrix every_position_clauses = create_every_position_clauses(variables_table);
-				int_matrix appear_clauses = create_appear_clauses(variables_table);
-				int_matrix appear_twice_clauses = create_appear_twice_clauses(variables_table);
+      int_matrix variables_table = create_index_table(numVertices);
+			int_matrix two_nodes_clauses = create_two_nodes_clauses(variables_table);
+			int_matrix every_position_clauses = create_every_position_clauses(variables_table);
+			int_matrix appear_clauses = create_appear_clauses(variables_table);
+			int_matrix appear_twice_clauses = create_appear_twice_clauses(variables_table);
+			int_matrix nonadjacent_nodes_clauses = create_nonadjacent_nodes_clauses(variables_table, edges);
 
-				int_matrix clauses;
+			int_matrix clauses;
 
-				clauses.insert(clauses.begin(),two_nodes_clauses.begin(), two_nodes_clauses.end());
-				clauses.insert(clauses.end(),two_nodes_clauses.begin(), two_nodes_clauses.end());
-				clauses.insert(clauses.end(),every_position_clauses.begin(), every_position_clauses.end());
-				clauses.insert(clauses.end(),appear_clauses.begin(), appear_clauses.end());
-				clauses.insert(clauses.end(),appear_twice_clauses.begin(), appear_twice_clauses.end());       
+			clauses.insert(clauses.begin(),two_nodes_clauses.begin(), two_nodes_clauses.end());
+			clauses.insert(clauses.end(),two_nodes_clauses.begin(), two_nodes_clauses.end());
+			clauses.insert(clauses.end(),every_position_clauses.begin(), every_position_clauses.end());
+			clauses.insert(clauses.end(),appear_clauses.begin(), appear_clauses.end());
+			clauses.insert(clauses.end(),appear_twice_clauses.begin(), appear_twice_clauses.end());  
+			clauses.insert(clauses.end(),nonadjacent_nodes_clauses.begin(), nonadjacent_nodes_clauses.end());
 
-    }
+			print_clauses(clauses, numVertices);
+			print_clauses_file(clauses, numVertices);
+		}
 };
+
+void print_clauses_file(int_matrix clauses, int num_vertices){
+
+	int num_variables = num_vertices*NUM_COLORS;	
+	ofstream file;
+	file.open("clauses_cleaning_apartment.cnf");
+
+	file << "p cnf ";
+	file << num_variables;
+	file <<" "<< clauses.size() << endl;
+
+	for(auto clause : clauses){
+		for(auto variable : clause){
+			file << variable << ' ';
+		}
+		file << "0" << endl;
+	}
+	file.close();
+}
+
+void print_clauses(int_matrix clauses, int num_vertices){
+
+	int num_variables = num_vertices*num_vertices;
+	cout << clauses.size() << " ";
+	cout << num_variables << endl;
+
+	for(auto clause : clauses){
+		for(auto variable : clause){
+			cout << variable << " ";
+		}
+		cout << "0" << endl;
+	}
+}
 
 int_matrix create_two_nodes_clauses(const int_matrix variables_table){
 
@@ -132,7 +172,26 @@ int_matrix create_index_table(int num_vertices){
 int_matrix create_nonadjacent_nodes_clauses(const int_matrix variables_table, vector<Edge> edges){
 
 	unordered_set<string> graph_pairs = pairs_in_graph(edges);
+	unordered_set<string>::const_iterator set_iterator;
 
+	int_matrix clauses;	
+	
+	for (size_t j = 0; j < variables_table.size(); j++)
+	{
+		for (size_t i = 0; i < variables_table.size(); i++)
+		{
+			if(i == j) continue;
+			for (size_t k = 0; k < variables_table.size() - 1; k++)
+			{
+				set_iterator = graph_pairs.find(to_string(i)+'-'+to_string(j));
+				bool pair_in_graph = set_iterator != graph_pairs.end();
+
+				if(pair_in_graph) continue;				
+				clauses.push_back({-variables_table[k][i],-variables_table[k+1][j]});
+			}			
+		}
+	}
+	return clauses;
 }
 
 unordered_set<string> pairs_in_graph(vector<Edge> edges){
