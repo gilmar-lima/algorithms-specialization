@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <unordered_set>
 
 using namespace std;
 
@@ -17,6 +18,8 @@ int_matrix create_index_table(int num_vertices);
 int_matrix create_appear_clauses(const int_matrix variables_table);
 int_matrix create_every_position_clauses(const int_matrix variables_table);
 int_matrix create_two_nodes_clauses(const int_matrix variables_table);
+int_matrix create_appear_twice_clauses(const int_matrix variables_table);
+unordered_set<string> pairs_in_graph(vector<Edge> edges);
 struct ConvertHampathToSat {
     int numVertices;
     vector<Edge> edges;
@@ -29,7 +32,18 @@ struct ConvertHampathToSat {
     void printEquisatisfiableSatFormula() {
 
         int_matrix variables_table = create_index_table(numVertices);
-        
+				int_matrix two_nodes_clauses = create_two_nodes_clauses(variables_table);
+				int_matrix every_position_clauses = create_every_position_clauses(variables_table);
+				int_matrix appear_clauses = create_appear_clauses(variables_table);
+				int_matrix appear_twice_clauses = create_appear_twice_clauses(variables_table);
+
+				int_matrix clauses;
+
+				clauses.insert(clauses.begin(),two_nodes_clauses.begin(), two_nodes_clauses.end());
+				clauses.insert(clauses.end(),two_nodes_clauses.begin(), two_nodes_clauses.end());
+				clauses.insert(clauses.end(),every_position_clauses.begin(), every_position_clauses.end());
+				clauses.insert(clauses.end(),appear_clauses.begin(), appear_clauses.end());
+				clauses.insert(clauses.end(),appear_twice_clauses.begin(), appear_twice_clauses.end());       
 
     }
 };
@@ -101,7 +115,7 @@ int_matrix create_appear_twice_clauses(const int_matrix variables_table){
 }
 
 int_matrix create_index_table(int num_vertices){
-
+	
 	vector<int> row (num_vertices,0);
 	int_matrix table (num_vertices,row);
 
@@ -113,6 +127,23 @@ int_matrix create_index_table(int num_vertices){
 		}
 	}
 	return table;	
+}
+
+int_matrix create_nonadjacent_nodes_clauses(const int_matrix variables_table, vector<Edge> edges){
+
+	unordered_set<string> graph_pairs = pairs_in_graph(edges);
+
+}
+
+unordered_set<string> pairs_in_graph(vector<Edge> edges){
+
+	unordered_set<string> pairs_in_graph;
+
+	for(Edge edge_ : edges){
+		pairs_in_graph.insert(to_string(edge_.from)+'-'+to_string(edge_.to));
+		pairs_in_graph.insert(to_string(edge_.to)+'-'+to_string(edge_.from));
+	}
+	return pairs_in_graph;
 }
 
 int main() {
