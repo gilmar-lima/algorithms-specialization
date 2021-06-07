@@ -88,40 +88,6 @@ void print_clauses(int_matrix clauses, int num_vertices){
 	}
 }
 
-int_matrix create_two_nodes_clauses(const int_matrix variables_table){
-
-	int_matrix clauses;	
-	
-	for (size_t i = 0; i < variables_table.size(); i++)
-	{
-		for (size_t j = 0; j < variables_table[0].size(); j++)
-		{
-			for (size_t k = j+1; k < variables_table[0].size(); k++)
-			{
-				if(j==k) continue;
-				clauses.push_back({-variables_table[i][j],-variables_table[i][k]});
-			}			
-		}
-	}
-	return clauses;
-}
-
-int_matrix create_every_position_clauses(const int_matrix variables_table){
-
-	int_matrix clauses;
-	vector<int> clause (variables_table[0].size(),0);
-	
-	for (size_t i = 0; i < variables_table.size(); i++)
-	{
-		for (size_t j = 0; j < variables_table[0].size(); j++)
-		{
-			clause[j] = variables_table[i][j];
-		}
-		clauses.push_back(clause);		
-	}
-	return clauses;
-}
-
 int_matrix create_appear_clauses(const int_matrix variables_table){
 
 	int_matrix clauses;
@@ -146,10 +112,70 @@ int_matrix create_appear_twice_clauses(const int_matrix variables_table){
 	{
 		for (size_t i = 0; i < variables_table.size(); i++)
 		{
-			for (size_t k = i+1; k < variables_table.size(); k++)
+			for (size_t k = 0; k < variables_table.size(); k++)
 			{
 				if(i==k) continue;
 				clauses.push_back({-variables_table[i][j],-variables_table[k][j]});
+			}			
+		}
+	}
+	return clauses;
+}
+
+int_matrix create_every_position_clauses(const int_matrix variables_table){
+
+	int_matrix clauses;
+	vector<int> clause (variables_table[0].size(),0);
+	
+	for (size_t i = 0; i < variables_table.size(); i++)
+	{
+		for (size_t j = 0; j < variables_table[0].size(); j++)
+		{
+			clause[j] = variables_table[i][j];
+		}
+		clauses.push_back(clause);		
+	}
+	return clauses;
+}
+
+int_matrix create_two_nodes_clauses(const int_matrix variables_table){
+
+	int_matrix clauses;	
+	
+	for (size_t i = 0; i < variables_table.size(); i++)
+	{
+		for (size_t j = 0; j < variables_table[0].size(); j++)
+		{
+			for (size_t k = 0; k < variables_table[0].size(); k++)
+			{
+				if(j==k) continue;
+				clauses.push_back({-variables_table[i][j],-variables_table[i][k]});
+			}			
+		}
+	}
+	return clauses;
+}
+
+int_matrix create_nonadjacent_nodes_clauses(const int_matrix variables_table, vector<Edge> edges){
+
+	unordered_set<string> graph_pairs = pairs_in_graph(edges);
+	unordered_set<string>::const_iterator set_iterator;
+
+	int_matrix clauses;	
+	
+	for (size_t j = 0; j < variables_table.size(); j++)
+	{
+		for (size_t i = 0; i < variables_table.size(); i++)
+		{
+			//if(i == j) continue;
+
+			set_iterator = graph_pairs.find(to_string(i+1)+'-'+to_string(j+1));
+			bool pair_in_graph = set_iterator != graph_pairs.end();
+			if(pair_in_graph) continue;
+
+			for (size_t k = 0; k < variables_table.size() - 1; k++)
+			{								
+				clauses.push_back({-variables_table[k][i],-variables_table[k+1][j]});
 			}			
 		}
 	}
@@ -169,32 +195,6 @@ int_matrix create_index_table(int num_vertices){
 		}
 	}
 	return table;	
-}
-
-int_matrix create_nonadjacent_nodes_clauses(const int_matrix variables_table, vector<Edge> edges){
-
-	unordered_set<string> graph_pairs = pairs_in_graph(edges);
-	unordered_set<string>::const_iterator set_iterator;
-
-	int_matrix clauses;	
-	
-	for (size_t j = 0; j < variables_table.size(); j++)
-	{
-		for (size_t i = 0; i < variables_table.size(); i++)
-		{
-			if(i == j) continue;
-
-			set_iterator = graph_pairs.find(to_string(i+1)+'-'+to_string(j+1));
-			bool pair_in_graph = set_iterator != graph_pairs.end();
-			if(pair_in_graph) continue;
-
-			for (size_t k = 0; k < variables_table.size() - 1; k++)
-			{								
-				clauses.push_back({-variables_table[k][i],-variables_table[k+1][j]});
-			}			
-		}
-	}
-	return clauses;
 }
 
 unordered_set<string> pairs_in_graph(vector<Edge> edges){
