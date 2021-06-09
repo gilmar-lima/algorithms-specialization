@@ -43,15 +43,14 @@ struct ConvertHampathToSat {
 
 			int_matrix clauses;
 
-			clauses.insert(clauses.begin(),two_nodes_clauses.begin(), two_nodes_clauses.end());
-			clauses.insert(clauses.end(),two_nodes_clauses.begin(), two_nodes_clauses.end());
-			clauses.insert(clauses.end(),every_position_clauses.begin(), every_position_clauses.end());
 			clauses.insert(clauses.end(),appear_clauses.begin(), appear_clauses.end());
 			clauses.insert(clauses.end(),appear_twice_clauses.begin(), appear_twice_clauses.end());  
+			clauses.insert(clauses.end(),every_position_clauses.begin(), every_position_clauses.end());
+			clauses.insert(clauses.end(),two_nodes_clauses.begin(), two_nodes_clauses.end());
 			clauses.insert(clauses.end(),nonadjacent_nodes_clauses.begin(), nonadjacent_nodes_clauses.end());
 
 			print_clauses(clauses, numVertices);
-			//print_clauses_file(clauses, numVertices);
+			print_clauses_file(clauses, numVertices);
 		}
 };
 
@@ -167,11 +166,11 @@ int_matrix create_nonadjacent_nodes_clauses(const int_matrix variables_table, ve
 	{
 		for (size_t i = 0; i < variables_table.size(); i++)
 		{
-			//if(i == j) continue;
+			///if(i==j) continue;
 
 			set_iterator = graph_pairs.find(to_string(i+1)+'-'+to_string(j+1));
 			bool pair_in_graph = set_iterator != graph_pairs.end();
-			if(pair_in_graph) continue;
+			if(pair_in_graph) continue;	
 
 			for (size_t k = 0; k < variables_table.size() - 1; k++)
 			{								
