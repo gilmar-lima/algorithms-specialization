@@ -1,10 +1,17 @@
 #include <bits/stdc++.h>
+#include <stdlib.h>
+#include <vector>
+
 using namespace std;
+
 
 struct Clause {
     int firstVar;
     int secondVar;
 };
+
+vector<vector<int>> make_implication_graph(vector<Clause> clauses, int numVars);
+
 
 struct TwoSatisfiability {
     int numVars;
@@ -16,37 +23,34 @@ struct TwoSatisfiability {
     {  }
 
     bool isSatisfiable(vector<int>& result) {
-        // This solution tries all possible 2^n variable assignments.
-        // It is too slow to pass the problem.
-        // Implement a more efficient algorithm here.
-        for (int mask = 0; mask < (1 << numVars); ++mask) {
-            for (int i = 0; i < numVars; ++i) {
-                result[i] = (mask >> i) & 1;
-            }
 
-            bool formulaIsSatisfied = true;
-
-            for (const Clause& clause: clauses) {
-                bool clauseIsSatisfied = false;
-                if (result[abs(clause.firstVar) - 1] == (clause.firstVar < 0)) {
-                    clauseIsSatisfied = true;
-                }
-                if (result[abs(clause.secondVar) - 1] == (clause.secondVar < 0)) {
-                    clauseIsSatisfied = true;
-                }
-                if (!clauseIsSatisfied) {
-                    formulaIsSatisfied = false;
-                    break;
-                }
-            }
-
-            if (formulaIsSatisfied) {
-                return true;
-            }
-        }
-        return false;
+        vector<vector<int>> implication_graph;
+        implication_graph = make_implication_graph(clauses, numVars);
     }
 };
+
+int variable_to_vertex(int variable, int numVars){
+
+    if(variable<0) return (abs(variable) - 1 + numVars);
+    return variable -1;    
+}
+
+vector<vector<int>> make_implication_graph(vector<Clause> clauses, int numVars){
+    vector<vector<int>> implication_graph (2*numVars);
+
+    for(Clause clause_ : clauses){
+
+        int l1 = variable_to_vertex(clause_.firstVar,numVars);
+        int l2 = variable_to_vertex(clause_.secondVar,numVars);
+        int not_l1 = variable_to_vertex(-clause_.firstVar,numVars);
+        int not_l2 = variable_to_vertex(-clause_.secondVar,numVars);
+
+        implication_graph[not_l1].push_back(l2);
+        implication_graph[not_l2].push_back(l1);
+    }
+    return implication_graph;
+}
+
 
 int main() {
     ios::sync_with_stdio(false);
