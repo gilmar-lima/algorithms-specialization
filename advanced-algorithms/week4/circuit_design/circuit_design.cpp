@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 #include <stdlib.h>
 #include <vector>
+#include <unordered_set>
+#include <stack>
 
 using namespace std;
 
@@ -11,7 +13,10 @@ struct Clause {
 };
 
 vector<vector<int>> make_implication_graph(vector<Clause> clauses, int numVars);
-
+stack<int> DFS(vector<vector<int> > &adj);
+void explore(vector<bool> &visited, vector<vector<int> > &adj,const int &v, stack<int> &store);
+int variable_to_vertex(int variable, int numVars);
+vector<vector<int>> reverse_graph(vector<vector<int>> implication_graph);
 
 struct TwoSatisfiability {
     int numVars;
@@ -29,10 +34,53 @@ struct TwoSatisfiability {
     }
 };
 
-int variable_to_vertex(int variable, int numVars){
+vector<unordered_set<int>> SCC(vector<vector<int>> implication_graph){
+	stack<int> store = DFS(implication_graph);
+	vector<vector<int>> reversed = reverse_graph(implication_graph);
 
-    if(variable<0) return (abs(variable) - 1 + numVars);
-    return variable -1;    
+}
+
+vector<vector<int>> reverse_graph(vector<vector<int>> implication_graph){
+	vector<vector<int>> reversed (implication_graph.size());
+
+	auto reverse_vertex = [&implication_graph, &reversed](int v){
+		for(auto vertex : implication_graph[v]){
+			reversed[vertex].push_back(v);			
+		}
+	};
+
+	for(int v = 0; v < implication_graph.size(); v++){
+		reverse_vertex(v);		
+	}	
+
+	return reversed;
+}
+
+stack<int> DFS(vector<vector<int> > &adj){
+  stack<int> store;
+  vector<bool> visited (adj.size(), false);
+
+  for (size_t v = 0; v < adj.size(); v++)
+  {
+    if(visited[v]) continue;
+    explore(visited,adj,v, store); 
+  } 
+  return store;
+}
+
+void explore(vector<bool> &visited, vector<vector<int> > &adj,const int &v, stack<int> &store){
+
+  visited[v] = true;
+
+  for (auto w : adj[v])
+  {
+    if(!visited[w]){
+      explore(visited,adj,w,store);      
+    }else{
+      store.push(w);
+			return;
+    }
+  }
 }
 
 vector<vector<int>> make_implication_graph(vector<Clause> clauses, int numVars){
@@ -51,6 +99,11 @@ vector<vector<int>> make_implication_graph(vector<Clause> clauses, int numVars){
     return implication_graph;
 }
 
+int variable_to_vertex(int variable, int numVars){
+
+    if(variable<0) return (abs(variable) - 1 + numVars);
+    return variable -1;    
+}
 
 int main() {
     ios::sync_with_stdio(false);
