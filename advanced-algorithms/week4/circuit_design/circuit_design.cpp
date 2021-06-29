@@ -20,7 +20,9 @@ vector<vector<int>> reverse_graph(vector<vector<int>> implication_graph);
 void explore_scc(vector<bool> &visited, vector<vector<int> > &reversed, int &v, unordered_set<int> &scc);
 vector<unordered_set<int>> dfs_scc(vector<vector<int>> &reverserd, stack<int> store);
 vector<unordered_set<int>> SCC(vector<vector<int>> implication_graph);
-
+bool is_unsatisfiable(vector<unordered_set<int>> sccs, int numVars);
+int vertex_to_variable(int vertex, int numVars);
+vector<int> find_result(vector<unordered_set<int>> sccs, int numVars);
 
 struct TwoSatisfiability {
     int numVars;
@@ -37,8 +39,54 @@ struct TwoSatisfiability {
         implication_graph = make_implication_graph(clauses, numVars);
 				vector<unordered_set<int>> sccs = SCC(implication_graph);
 
+				if(is_unsatisfiable(sccs,numVars)) return false;
+
+				result = find_result(sccs, numVars);
+				return true;
     }
 };
+
+void set_result(int variable, vector<int> &result){
+
+	bool already_set = result[abs(variable)-1] != -1;
+	if(already_set) return;
+
+	if(variable < 0){
+		result[abs(variable)-1] = 0;
+	}else{
+		result[variable -1] = 1;
+	}
+}
+
+vector<int> find_result(vector<unordered_set<int>> sccs, int numVars){
+	vector<int> result(numVars, -1);
+	
+	for(unordered_set<int> scc : sccs){
+		for(int vertex : scc){
+			int variable = vertex_to_variable(vertex,numVars);
+			set_result(variable, result);
+		}
+	}
+	return result;
+}
+
+
+
+bool is_unsatisfiable(vector<unordered_set<int>> sccs, int numVars){
+
+	for (int var = 1; var <= numVars; var++)
+	{
+		int x = variable_to_vertex(var, numVars);
+		int not_x = variable_to_vertex(-var, numVars);
+
+		for(unordered_set<int> scc : sccs){
+			bool x_in_set = scc.find(x) != scc.end();
+			bool not_x_in_set = scc.find(not_x) != scc.end();
+			if(x_in_set && not_x_in_set) return true;
+		}
+	}
+	return false;
+}
 
 vector<unordered_set<int>> SCC(vector<vector<int>> implication_graph){
 	stack<int> store = dfs_stack(implication_graph);
@@ -138,6 +186,12 @@ int variable_to_vertex(int variable, int numVars){
 
     if(variable<0) return (abs(variable) - 1 + numVars);
     return variable -1;    
+}
+
+int vertex_to_variable(int vertex, int numVars){
+
+		if(vertex + 1 > numVars)	return (-1)*(vertex + 1 - numVars);
+		return vertex + 1;      
 }
 
 int main() {
