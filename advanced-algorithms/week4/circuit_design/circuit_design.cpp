@@ -16,13 +16,13 @@ vector<vector<int>> make_implication_graph(vector<Clause> clauses, int numVars);
 stack<int> dfs_stack(vector<vector<int> > &adj);
 void explore_stack(vector<bool> &visited, vector<vector<int> > &adj,const int &v, stack<int> &store);
 int variable_to_vertex(int variable, int numVars);
-vector<vector<int>> reverse_graph(vector<vector<int>> implication_graph);
+vector<vector<int>> reverse_graph(vector<vector<int>> &implication_graph);
 void explore_scc(vector<bool> &visited, vector<vector<int> > &reversed, int &v, unordered_set<int> &scc);
 vector<unordered_set<int>> dfs_scc(vector<vector<int>> &reverserd, stack<int> store);
-vector<unordered_set<int>> SCC(vector<vector<int>> implication_graph);
-bool is_unsatisfiable(vector<unordered_set<int>> sccs, int numVars);
+vector<unordered_set<int>> SCC(vector<vector<int>> &implication_graph);
+bool is_unsatisfiable(vector<unordered_set<int>> &sccs, int numVars);
 int vertex_to_variable(int vertex, int numVars);
-vector<int> find_result(vector<unordered_set<int>> sccs, int numVars);
+vector<int> find_result(vector<unordered_set<int>> &sccs, int numVars);
 
 struct TwoSatisfiability {
     int numVars;
@@ -58,7 +58,7 @@ void set_result(int variable, vector<int> &result){
 	}
 }
 
-vector<int> find_result(vector<unordered_set<int>> sccs, int numVars){
+vector<int> find_result(vector<unordered_set<int>> &sccs, int numVars){
 	vector<int> result(numVars, -1);
 	
 	for(unordered_set<int> scc : sccs){
@@ -72,7 +72,7 @@ vector<int> find_result(vector<unordered_set<int>> sccs, int numVars){
 
 
 
-bool is_unsatisfiable(vector<unordered_set<int>> sccs, int numVars){
+bool is_unsatisfiable(vector<unordered_set<int>> &sccs, int numVars){
 
 	for (int var = 1; var <= numVars; var++)
 	{
@@ -88,7 +88,7 @@ bool is_unsatisfiable(vector<unordered_set<int>> sccs, int numVars){
 	return false;
 }
 
-vector<unordered_set<int>> SCC(vector<vector<int>> implication_graph){
+vector<unordered_set<int>> SCC(vector<vector<int>> &implication_graph){
 	stack<int> store = dfs_stack(implication_graph);
 	vector<vector<int>> reversed = reverse_graph(implication_graph);
 	vector<unordered_set<int>> sccs = dfs_scc(reversed, store);
@@ -127,7 +127,7 @@ vector<unordered_set<int>> dfs_scc(vector<vector<int>> &reverserd, stack<int> st
   return sccs;
 }
 
-vector<vector<int>> reverse_graph(vector<vector<int>> implication_graph){
+vector<vector<int>> reverse_graph(vector<vector<int>> &implication_graph){
 	vector<vector<int>> reversed (implication_graph.size());
 
 	auto reverse_vertex = [&implication_graph, &reversed](int v){
