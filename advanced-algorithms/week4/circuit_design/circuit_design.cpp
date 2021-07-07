@@ -112,7 +112,7 @@ void explore_scc(vector<bool> &visited, vector<vector<int> > &reversed, int &v, 
 vector<unordered_set<int>> dfs_scc(vector<vector<int>> &reverserd, stack<int> store){
   vector<bool> visited (reverserd.size(), false);
 	vector<unordered_set<int>> sccs;
-	unordered_set<int> scc;
+	unordered_set<int> scc;	
 
   while(!store.empty())
   {
@@ -120,9 +120,8 @@ vector<unordered_set<int>> dfs_scc(vector<vector<int>> &reverserd, stack<int> st
 			store.pop();
 			continue;
 		}
-    explore_scc(visited,reverserd,store.top(), scc);
-		sccs.push_back(scc);
-		scc.clear();
+		sccs.push_back(scc);		
+    explore_scc(visited,reverserd,store.top(), sccs.back());		
   } 
   return sccs;
 }
