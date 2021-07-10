@@ -70,8 +70,6 @@ vector<int> find_result(vector<unordered_set<int>> &sccs, int numVars){
 	return result;
 }
 
-
-
 bool is_unsatisfiable(vector<unordered_set<int>> &sccs, int numVars){
 
 	for (int var = 1; var <= numVars; var++)

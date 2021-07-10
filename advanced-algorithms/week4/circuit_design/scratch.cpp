@@ -1,105 +1,108 @@
-#include <bits/stdc++.h>
-#include <stdlib.h>
-#include <vector>
-#include <unordered_set>
+// Kosaraju's algorithm to find strongly connected components in C++
+
+#include <iostream>
+#include <list>
 #include <stack>
 
 using namespace std;
 
-stack<int> dfs_stack(vector<vector<int> > &adj);
-void explore_stack(vector<bool> &visited, vector<vector<int> > &adj,const int &v, stack<int> &store);
-int variable_to_vertex(int variable, int numVars);
-vector<vector<int>> reverse_graph(vector<vector<int>> implication_graph);
-void explore_scc(vector<bool> &visited, vector<vector<int> > &reversed, int &v, unordered_set<int> &scc);
-vector<unordered_set<int>> dfs_scc(vector<vector<int>> &reverserd, stack<int> store);
+class Graph {
+  int V;
+  list<int> *adj;
+  void fillOrder(int s, bool visitedV[], stack<int> &Stack);
+  void DFS(int s, bool visitedV[]);
 
-vector<unordered_set<int>> SCC(vector<vector<int>> implication_graph){
-	stack<int> store = dfs_stack(implication_graph);
-	vector<vector<int>> reversed = reverse_graph(implication_graph);
-	vector<unordered_set<int>> sccs = dfs_scc(reversed, store);
-	return sccs;
+   public:
+  Graph(int V);
+  void addEdge(int s, int d);
+  void printSCC();
+  Graph transpose();
+};
+
+Graph::Graph(int V) {
+  this->V = V;
+  adj = new list<int>[V];
 }
 
-void explore_scc(vector<bool> &visited, vector<vector<int> > &reversed, int &v, unordered_set<int> &scc){
+// DFS
+void Graph::DFS(int s, bool visitedV[]) {
+  visitedV[s] = true;
+  cout << s << " ";
 
-  visited[v] = true;
-	scc.insert(v);
+  list<int>::iterator i;
+  for (i = adj[s].begin(); i != adj[s].end(); ++i)
+    if (!visitedV[*i])
+      DFS(*i, visitedV);
+}
 
-  for (auto w : reversed[v])
-  {
-    if(!visited[w]){
-      explore_scc(visited,reversed,w,scc);      
+// Transpose
+Graph Graph::transpose() {
+  Graph g(V);
+  for (int s = 0; s < V; s++) {
+    list<int>::iterator i;
+    for (i = adj[s].begin(); i != adj[s].end(); ++i) {
+      g.adj[*i].push_back(s);
     }
   }
-	return;
+  return g;
 }
 
-vector<unordered_set<int>> dfs_scc(vector<vector<int>> &reverserd, stack<int> store){
-  vector<bool> visited (reverserd.size(), false);
-	vector<unordered_set<int>> sccs;
-	unordered_set<int> scc;
-
-  while(!store.empty())
-  {
-    if(visited[store.top()]){
-			store.pop();
-			continue;
-		}
-    explore_scc(visited,reverserd,store.top(), scc);
-		sccs.push_back(scc);
-		scc.clear();
-  } 
-  return sccs;
+// Add edge into the graph
+void Graph::addEdge(int s, int d) {
+  adj[s].push_back(d);
 }
 
-vector<vector<int>> reverse_graph(vector<vector<int>> implication_graph){
-	vector<vector<int>> reversed (implication_graph.size());
+void Graph::fillOrder(int s, bool visitedV[], stack<int> &Stack) {
+  visitedV[s] = true;
 
-	auto reverse_vertex = [&implication_graph, &reversed](int v){
-		for(auto vertex : implication_graph[v]){
-			reversed[vertex].push_back(v);			
-		}
-	};
+  list<int>::iterator i;
+  for (i = adj[s].begin(); i != adj[s].end(); ++i)
+    if (!visitedV[*i])
+      fillOrder(*i, visitedV, Stack);
 
-	for(int v = 0; v < implication_graph.size(); v++){
-		reverse_vertex(v);		
-	}
-	return reversed;
+  Stack.push(s);
 }
 
-stack<int> dfs_stack(vector<vector<int> > &adj){
-  stack<int> store;
-  vector<bool> visited (adj.size(), false);
+// Print strongly connected component
+void Graph::printSCC() {
+  stack<int> Stack;
 
-  for (size_t v = 0; v < adj.size(); v++)
-  {
-    if(visited[v]) continue;
-    explore_stack(visited,adj,v, store);
-  } 
-  return store;
-}
+  bool *visitedV = new bool[V];
+  for (int i = 0; i < V; i++)
+    visitedV[i] = false;
 
-void explore_stack(vector<bool> &visited, vector<vector<int> > &adj,const int &v, stack<int> &store){
+  for (int i = 0; i < V; i++)
+    if (visitedV[i] == false)
+      fillOrder(i, visitedV, Stack);
 
-  visited[v] = true;	
+  Graph gr = transpose();
 
-  for (auto w : adj[v])
-  {
-    if(visited[w]) continue;
-    explore_stack(visited,adj,w,store);      
+  for (int i = 0; i < V; i++)
+    visitedV[i] = false;
+
+  while (Stack.empty() == false) {
+    int s = Stack.top();
+    Stack.pop();
+
+    if (visitedV[s] == false) {
+      gr.DFS(s, visitedV);
+      cout << endl;
+    }
   }
-	store.push(v);
 }
-
 
 int main() {
-  size_t n, m;
-  std::cin >> n >> m;
-  vector<vector<int> > adj(n, vector<int>());
-  for (size_t i = 0; i < m; i++) {
-    int x, y;
-    std::cin >> x >> y;
-    adj[x].push_back(y);
-  }
-  SCC(adj);
-}       
+  Graph g(8);
+  g.addEdge(0, 1);
+  g.addEdge(1, 2);
+  g.addEdge(2, 3);
+  g.addEdge(2, 4);
+  g.addEdge(3, 0);
+  g.addEdge(4, 5);
+  g.addEdge(5, 6);
+  g.addEdge(6, 4);
+  g.addEdge(6, 7);
+
+  cout << "Strongly Connected Components:\n";
+  g.printSCC();
+}
